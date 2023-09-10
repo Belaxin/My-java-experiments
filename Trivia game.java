@@ -1,5 +1,3 @@
-package Belaxin;
-
 
 import java.util.Scanner;
 
