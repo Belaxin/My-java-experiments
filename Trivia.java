@@ -1,7 +1,7 @@
 
 import java.util.Scanner;
 
-public class Main {
+public class Trivia {
     public static void main(String[] args) {
         //input setup
         Scanner scanner = new Scanner(System.in);

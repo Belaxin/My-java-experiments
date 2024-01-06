@@ -1,7 +1,7 @@
 
 import java.util.Scanner;
 
-public class Main {
+public class TicTac {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
         String[] Square = new String[10];

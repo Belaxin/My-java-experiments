@@ -1,3 +1,9 @@
+package bank;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.function.IntFunction;
+
+
 public class Person {
     public int age;
     public String firstName;
@@ -16,7 +22,9 @@ public class Person {
         this.socialSecurity = socialSecurity;
         this.password = password;
 
+
     }
+
 
 }
 

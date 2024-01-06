@@ -1,15 +1,15 @@
+package bank;
+
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-public class Bank {
+public class Bank implements Serializable {
     ArrayList<Person> clients = new ArrayList<>();
     Scanner scanner = new Scanner(System.in);
 
     // method for starting
-    public void start() {
-        registerAndLogin();
-    }
-
+    public void start() {registerAndLogin();}
 
     // method for inputting strings
     public String userInputString(Scanner scanner) {
@@ -59,9 +59,30 @@ public class Bank {
         String lastName = userInputString(scanner);
         System.out.println("Social Security: ");
         int socialSecurity = userInputInt(scanner);
+        // checks if socialSecurity is used
+        for (int k =0; k < clients.size(); k++){
+            if (clients.get(k).socialSecurity==socialSecurity){
+                System.out.println("Account already exists");
+                start();
+            }
+        }
         System.out.println("Enter your password");
         String password = userInputString(scanner);
-        clients.add(new Person(age, firstName, middleName, lastName, socialSecurity, password));
+        clients.add(new Person (age, firstName, middleName, lastName, socialSecurity, password));
+
+        // Script for saving clients to a page WIP
+        /*try {
+            FileOutputStream fos = new FileOutputStream("BankClients.ser");
+            ObjectOutputStream oos = new ObjectOutputStream(fos);
+            // write object to file
+            oos.writeObject(clients);
+            System.out.println("Done");
+            // closing resources
+            oos.close();
+            fos.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }*/
     }
 
     // method for logging in using credentials
@@ -80,6 +101,7 @@ public class Bank {
             System.out.println("Details doesn't match");
             login();
         }
+        System.out.println("Details doesn't match");
         registerAndLogin();
     }
 
@@ -89,8 +111,9 @@ public class Bank {
         System.out.println("1. check balance");
         System.out.println("2. Deposit cash");
         System.out.println("3. Draw cash");
-        System.out.println("4. Log out");
-        System.out.println("5. Profile");
+        System.out.println("4. Send cash");
+        System.out.println("5. Log out");
+        System.out.println("6. Profile");
         int input = userInputInt(scanner);
         if (input == 1) {
             balance(i);
@@ -99,10 +122,12 @@ public class Bank {
         } else if (input == 3) {
             draw(i);
         } else if (input == 4) {
-            start();
+            sendMoney(i);
         } else if (input == 5) {
+            start();
+        } else if (input==6) {
             profile(i);
-        } else {
+        }else {
             System.out.println("You must enter a number");
             menu(i);
         }
@@ -137,8 +162,33 @@ public class Bank {
         System.out.println("Surname: " + clients.get(i).surName);
         System.out.println("Social Security Number: " + clients.get(i).socialSecurity);
         System.out.println("Age: " + clients.get(i).age);
+        System.out.println("Account id " + i );
         System.out.println();
         menu(i);
     }
+
+    // method for sending money to another account
+    public void sendMoney(int i) {
+        System.out.println("Please enter another account's Id, the id can be found on the profile page");
+        int sendId = userInputInt(scanner);
+        for (int k = 0; k < clients.size(); k++) {
+            if (sendId != clients.get(k).socialSecurity) {
+                continue;
+            } else if (sendId == clients.get(k).socialSecurity) {
+                System.out.println("Please enter the amount you would like to send");
+                int sendAmount = userInputInt(scanner);
+                // this rejects negative numbers to prevent stealing
+                if (sendAmount < 0)   {System.out.println("You must enter a positive number");sendMoney(i); }
+                clients.get(i).balance -= sendAmount;
+                clients.get(k).balance += sendAmount;
+            }else {
+                System.out.println("Account id not found");
+                menu(i);
+            }
+
+
+        }
+    }
+
 
 }
