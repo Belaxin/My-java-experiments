@@ -61,7 +61,7 @@ public class Bank implements Serializable {
         int socialSecurity = userInputInt(scanner);
         // checks if socialSecurity is used
         for (int k =0; k < clients.size(); k++){
-            if (clients.get(k).socialSecurity==socialSecurity){
+            if (clients.get(k).getSocialSecurity() ==socialSecurity){
                 System.out.println("Account already exists");
                 start();
             }
@@ -90,17 +90,18 @@ public class Bank implements Serializable {
         System.out.println("Login: Enter social security");
         int socialSecurityLogin = userInputInt(scanner);
         for (int i = 0; i < clients.size(); i++) {
-            if (socialSecurityLogin != clients.get(i).socialSecurity) {
+            if (socialSecurityLogin != clients.get(i).getSocialSecurity()) {
                 continue;
             }
             System.out.println("Enter password");
             String passwordLogin = userInputString(scanner);
-            if (passwordLogin.equals(clients.get(i).password)) {
+            if (passwordLogin.equals(clients.get(i).getPassword())) {
                 menu(i);
             }else {
             System.out.println("Details doesn't match");
             login();
             }
+            login();
         }
     }
 
@@ -150,17 +151,17 @@ public class Bank implements Serializable {
     public void draw(int i) {
         System.out.println("How much money would you like to draw out?");
         clients.get(i).balance -= scanner.nextInt();
-        System.out.println("Your balance is now " + clients.get(i).balance + "$");
+        System.out.println("Your balance is now " + clients.get(i).getBalance() + "$");
         menu(i);
     }
 
     // method for checking your profile settings
     public void profile(int i) {
-        System.out.println("First name: " + clients.get(i).firstName);
-        System.out.println("Middle name: " + clients.get(i).middleName);
-        System.out.println("Surname: " + clients.get(i).surName);
-        System.out.println("Social Security Number: " + clients.get(i).socialSecurity);
-        System.out.println("Age: " + clients.get(i).age);
+        System.out.println("First name: " + clients.get(i).getFirstName());
+        System.out.println("Middle name: " + clients.get(i).getMiddleName());
+        System.out.println("Surname: " + clients.get(i).getSurName());
+        System.out.println("Social Security Number: " + clients.get(i).getSocialSecurity());
+        System.out.println("Age: " + clients.get(i).getAge());
         System.out.println("Account id " + i );
         System.out.println();
         menu(i);
@@ -178,7 +179,7 @@ public class Bank implements Serializable {
                 int sendAmount = userInputInt(scanner);
                 // this rejects negative numbers to prevent stealing
                 if (sendAmount < 0)   {System.out.println("You must enter a positive number");sendMoney(i); }
-                clients.get(i).balance -= sendAmount;
+                clients.get(i).balance-= sendAmount;
                 clients.get(k).balance += sendAmount;
                 menu(i);
             }else {

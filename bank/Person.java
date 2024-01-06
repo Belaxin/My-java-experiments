@@ -5,12 +5,12 @@ import java.util.function.IntFunction;
 
 
 public class Person {
-    public int age;
-    public String firstName;
-    public String middleName;
-    public String surName;
-    protected int socialSecurity;
-    protected String password;
+    private int age;
+    private String firstName;
+    private String middleName;
+    private String surName;
+    private int socialSecurity;
+    private String password;
     protected int balance = 0;
 
 
@@ -24,8 +24,31 @@ public class Person {
 
 
     }
+    
 
+    public int getSocialSecurity() {
+        return socialSecurity;
+    }
 
+    public int getAge() {
+        return age;
+    }
+
+    public int getBalance() {
+        return balance;
+    }
+    protected String getPassword(){
+        return password;
+    }
+    public String getFirstName(){
+        return firstName;
+    }
+    public String getSurName(){
+        return surName;
+    }
+    public String getMiddleName(){
+        return middleName;
+    }
 }
 
 
