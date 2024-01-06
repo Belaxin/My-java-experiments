@@ -97,12 +97,11 @@ public class Bank implements Serializable {
             String passwordLogin = userInputString(scanner);
             if (passwordLogin.equals(clients.get(i).password)) {
                 menu(i);
-            }
+            }else {
             System.out.println("Details doesn't match");
             login();
+            }
         }
-        System.out.println("Details doesn't match");
-        registerAndLogin();
     }
 
     // method for the logged in menu
@@ -172,15 +171,16 @@ public class Bank implements Serializable {
         System.out.println("Please enter another account's Id, the id can be found on the profile page");
         int sendId = userInputInt(scanner);
         for (int k = 0; k < clients.size(); k++) {
-            if (sendId != clients.get(k).socialSecurity) {
+            if (sendId != k) {
                 continue;
-            } else if (sendId == clients.get(k).socialSecurity) {
+            } else if (sendId == k) {
                 System.out.println("Please enter the amount you would like to send");
                 int sendAmount = userInputInt(scanner);
                 // this rejects negative numbers to prevent stealing
                 if (sendAmount < 0)   {System.out.println("You must enter a positive number");sendMoney(i); }
                 clients.get(i).balance -= sendAmount;
                 clients.get(k).balance += sendAmount;
+                menu(i);
             }else {
                 System.out.println("Account id not found");
                 menu(i);
