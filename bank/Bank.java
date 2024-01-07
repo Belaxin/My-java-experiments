@@ -4,8 +4,7 @@ import java.util.HashMap;
 import java.util.Scanner;
 
 public class Bank {
-    int accountId = 0;
-    public static HashMap<Integer, Account> clients = new HashMap<>();
+    static HashMap<Integer, Account> clients = new HashMap<>();
     final private static HashMap<Integer, Integer> socialSecurity_Id = new HashMap<>();
     Scanner scanner = new Scanner(System.in);
 
@@ -47,8 +46,8 @@ public class Bank {
         System.out.println("Register or login?");
         String input = (userInputString(scanner));
         if (input.equalsIgnoreCase("register")) {
-            accountId = createAccount();
-            System.out.println("amount of accs." + accountId);
+            createAccount();
+            System.out.println("amount of accs." + clients.size());
             login();
         } else if (input.equalsIgnoreCase("login")) {
             login();
@@ -59,7 +58,7 @@ public class Bank {
     }
 
     // method that creates an object using credentials added
-    public int createAccount() {
+    public void createAccount() {
         System.out.println("Enter age: ");
         int age = userInputInt(scanner);
         System.out.println("First name: ");
@@ -74,14 +73,12 @@ public class Bank {
         if (socialSecurity_Id.containsKey(socialSecurity)) {
             System.out.println("Account already exists");
             createAccount();
-            return accountId;
+            return;
         }
         System.out.println("Enter your password: ");
         String password = userInputString(scanner);
-        accountId++;
-        clients.put(accountId, new Account(socialSecurity, firstName, middleName, lastName, age, password, accountId));
-        socialSecurity_Id.put(socialSecurity, accountId);
-        return accountId;
+        clients.put(clients.size()+1, new Account(socialSecurity, firstName, middleName, lastName, age, password, clients.size()+1));
+        socialSecurity_Id.put(socialSecurity, clients.size());
     }
 
     // method for logging in using credentials
