@@ -1,15 +1,23 @@
 package bank;
 
-import java.io.*;
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Scanner;
 
-public class Bank implements Serializable {
-    ArrayList<Person> clients = new ArrayList<>();
+public class Bank {
+    int accountId = 0;
+    public static HashMap<Integer, Account> clients = new HashMap<>();
+    final private static HashMap<Integer, Integer> socialSecurity_Id = new HashMap<>();
     Scanner scanner = new Scanner(System.in);
 
+    // account getter
+    public Account getAccount(int accountId) {
+        return clients.get(accountId);
+    }
+
     // method for starting
-    public void start() {registerAndLogin();}
+    public void start() {
+        registerAndLogin();
+    }
 
     // method for inputting strings
     public String userInputString(Scanner scanner) {
@@ -39,16 +47,19 @@ public class Bank implements Serializable {
         System.out.println("Register or login?");
         String input = (userInputString(scanner));
         if (input.equalsIgnoreCase("register")) {
-            createAccount();
+            accountId = createAccount();
+            System.out.println("amount of accs." + accountId);
             login();
         } else if (input.equalsIgnoreCase("login")) {
             login();
 
+        } else {
+            start();
         }
     }
 
     // method that creates an object using credentials added
-    public void createAccount() {
+    public int createAccount() {
         System.out.println("Enter age: ");
         int age = userInputInt(scanner);
         System.out.println("First name: ");
@@ -58,138 +69,68 @@ public class Bank implements Serializable {
         System.out.println("Last name: ");
         String lastName = userInputString(scanner);
         System.out.println("Social Security: ");
-        int socialSecurity = userInputInt(scanner);
+        Integer socialSecurity = userInputInt(scanner);
         // checks if socialSecurity is used
-        for (int k =0; k < clients.size(); k++){
-            if (clients.get(k).getSocialSecurity() ==socialSecurity){
-                System.out.println("Account already exists");
-                start();
-            }
+        if (socialSecurity_Id.containsKey(socialSecurity)) {
+            System.out.println("Account already exists");
+            createAccount();
+            return accountId;
         }
-        System.out.println("Enter your password");
+        System.out.println("Enter your password: ");
         String password = userInputString(scanner);
-        clients.add(new Person (age, firstName, middleName, lastName, socialSecurity, password));
-
-        // Script for saving clients to a page WIP
-        /*try {
-            FileOutputStream fos = new FileOutputStream("BankClients.ser");
-            ObjectOutputStream oos = new ObjectOutputStream(fos);
-            // write object to file
-            oos.writeObject(clients);
-            System.out.println("Done");
-            // closing resources
-            oos.close();
-            fos.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }*/
+        accountId++;
+        clients.put(accountId, new Account(socialSecurity, firstName, middleName, lastName, age, password, accountId));
+        socialSecurity_Id.put(socialSecurity, accountId);
+        return accountId;
     }
 
     // method for logging in using credentials
     public void login() {
         System.out.println("Login: Enter social security");
         int socialSecurityLogin = userInputInt(scanner);
-        for (int i = 0; i < clients.size(); i++) {
-            if (socialSecurityLogin != clients.get(i).getSocialSecurity()) {
-                continue;
-            }
-            System.out.println("Enter password");
-            String passwordLogin = userInputString(scanner);
-            if (passwordLogin.equals(clients.get(i).getPassword())) {
-                menu(i);
-            }else {
-            System.out.println("Details doesn't match");
+        //noinspection DuplicateCondition
+        if (!socialSecurity_Id.containsKey(socialSecurityLogin)) {
+            System.out.println("That account doesn't exist");
             login();
+        } else //noinspection DuplicateCondition
+            if (socialSecurity_Id.containsKey(socialSecurityLogin)) {
+                System.out.println("Enter password");
+                String passwordLogin = userInputString(scanner);
+                if (clients.get(socialSecurity_Id.get(socialSecurityLogin)).getPassword().equals(Hashing.hash(passwordLogin))) {
+                    menu(socialSecurity_Id.get(socialSecurityLogin));
+                } else {
+                    System.out.println("Details don't match enter again");
+                    login();
+                }
             }
-            login();
-        }
     }
 
     // method for the logged in menu
-    public void menu(int i) {
-        System.out.println("Welcome, what would you like to do?");
-        System.out.println("1. check balance");
-        System.out.println("2. Deposit cash");
-        System.out.println("3. Draw cash");
-        System.out.println("4. Send cash");
-        System.out.println("5. Log out");
-        System.out.println("6. Profile");
+    public void menu(int accountId) {
+        System.out.println("Welcome, what would you like to do? \n 1. check balance \n 2. Deposit cash \n" +
+                " 3. Draw cash \n 4. Send cash \n 5. Log out \n 6. Profile");
         int input = userInputInt(scanner);
         if (input == 1) {
-            balance(i);
+            System.out.println(clients.get(accountId).getBalance());
+            menu(accountId);
         } else if (input == 2) {
-            deposit(i);
+            clients.get(accountId).deposit(accountId);
         } else if (input == 3) {
-            draw(i);
+            clients.get(accountId).withdraw(accountId);
         } else if (input == 4) {
-            sendMoney(i);
+            clients.get(accountId).sendMoney(accountId);
         } else if (input == 5) {
             start();
-        } else if (input==6) {
-            profile(i);
-        }else {
+        } else if (input == 6) {
+            clients.get(accountId).profile(accountId);
+        } else {
             System.out.println("You must enter a number");
-            menu(i);
-        }
-    }
-
-    // method for checking account balance
-    public void balance(int i) {
-        System.out.println("Your current balance is " + clients.get(i).balance + "$");
-        menu(i);
-    }
-
-    // method for depositing money to the account 
-    public void deposit(int i) {
-        System.out.println("How much money would you like to deposit?");
-        clients.get(i).balance += scanner.nextInt();
-        System.out.println("Your balance is now " + clients.get(i).balance + "$");
-        menu(i);
-    }
-
-    // method for drawing money from the account
-    public void draw(int i) {
-        System.out.println("How much money would you like to draw out?");
-        clients.get(i).balance -= scanner.nextInt();
-        System.out.println("Your balance is now " + clients.get(i).getBalance() + "$");
-        menu(i);
-    }
-
-    // method for checking your profile settings
-    public void profile(int i) {
-        System.out.println("First name: " + clients.get(i).getFirstName());
-        System.out.println("Middle name: " + clients.get(i).getMiddleName());
-        System.out.println("Surname: " + clients.get(i).getSurName());
-        System.out.println("Social Security Number: " + clients.get(i).getSocialSecurity());
-        System.out.println("Age: " + clients.get(i).getAge());
-        System.out.println("Account id " + i );
-        System.out.println();
-        menu(i);
-    }
-
-    // method for sending money to another account
-    public void sendMoney(int i) {
-        System.out.println("Please enter another account's Id, the id can be found on the profile page");
-        int sendId = userInputInt(scanner);
-        for (int k = 0; k < clients.size(); k++) {
-            if (sendId != k) {
-                continue;
-            } else if (sendId == k) {
-                System.out.println("Please enter the amount you would like to send");
-                int sendAmount = userInputInt(scanner);
-                // this rejects negative numbers to prevent stealing
-                if (sendAmount < 0)   {System.out.println("You must enter a positive number");sendMoney(i); }
-                clients.get(i).balance-= sendAmount;
-                clients.get(k).balance += sendAmount;
-                menu(i);
-            }else {
-                System.out.println("Account id not found");
-                menu(i);
-            }
-
-
+            menu(accountId);
         }
     }
 
 
 }
+
+
+
